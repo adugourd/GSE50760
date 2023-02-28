@@ -8,6 +8,7 @@ library(org.Hs.eg.db)
 library(readr)
 library(decoupleR)
 library(ggplot2)
+library(ggrepel)
 
 source("scripts/support_functions.R")
 
@@ -131,4 +132,27 @@ BCCA <- pathways_df[pathways_df$tf == "KEGG_VALINE_LEUCINE_AND_ISOLEUCINE_DEGRAD
 ttop <- ttopFormatter(topTable(limmaRes[[1]], coef = 3, number = 9180, adjust.method = "fdr")) #metastasis vs PMC
 ttop_BCCA <- ttop[ttop$ID %in% BCCA,]
 
-volcano_nice(ttop_BCCA, FCIndex = 2, pValIndex = 5, IDIndex = 1, )
+volcano_nice(ttop_BCCA, FCIndex = 2, pValIndex = 5, IDIndex = 1,nlabels = 30, label = T) + ggtitle("BCCA metastasis vs primary tumor") + ylab("-log10(pvalue)")
+
+dorothea_df <- decoupleR::get_dorothea()
+names(dorothea_df)[1] <- "tf"
+
+dorothea_df <- intersect_regulons(mat = as.matrix(t_table), network = dorothea_df, minsize = 10, .source = tf, .target = target)
+TF_mean <- run_wmean(mat = as.matrix(t_table), network = dorothea_df, .source = tf, times = 1000)
+TF_mean <- TF_mean[TF_mean$statistic == "norm_wmean",]
+TF_mean_df <- dcast(TF_mean, formula = source~condition, value.var = "score")
+row.names(TF_mean_df) <- TF_mean_df$source
+TF_mean_df <- TF_mean_df[,-1]
+
+TF_mean_df <- TF_mean_df[apply(abs(TF_mean_df), 1, max) > 3.5,]
+TF_mean_df <- TF_mean_df[order(TF_mean_df$METASTATIC_vs_ADJHEALTHY,decreasing = F),]
+
+to_plot <- melt(cbind(TF_mean_df, row.names(TF_mean_df)))
+names(to_plot)[1] <- "tf"
+
+to_plot$tf <- factor(to_plot$tf, levels = unique(to_plot$tf))
+
+ggplot(to_plot, aes(x = value, y = tf, color = variable, size = abs(value))) + 
+  geom_point(alpha = 0.5) + 
+  geom_vline(xintercept = 0) + 
+  theme_minimal()
