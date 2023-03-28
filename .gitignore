@@ -1,2 +1,4 @@
 .Rproj.user/**
 omnipathr-log/**
+.Rproj.user
+.DS_Store

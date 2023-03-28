@@ -93,6 +93,9 @@ t_table <- ttop_list_to_t_table(
                          adjust.method = "fdr"))
 
 row.names(t_table) <- t_table$ID
+
+write_csv(t_table, file = "results/differential_analysis_results.csv")
+
 t_table <- t_table[,-1]
 
 cp_pathways <- import_gmt(gmtfile = 'support/c2.cp.v7.2.symbols.gmt')
