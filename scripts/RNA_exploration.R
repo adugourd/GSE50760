@@ -156,3 +156,9 @@ ggplot(to_plot, aes(x = value, y = tf, color = variable, size = abs(value))) +
   geom_point(alpha = 0.5) + 
   geom_vline(xintercept = 0) + 
   theme_minimal()
+
+
+ARG_metab <- pathways_df[pathways_df$tf == "KEGG_ARGININE_AND_PROLINE_METABOLISM","target"]
+ttop_ARG_metab <- ttop[ttop$ID %in% ARG_metab,]
+
+volcano_nice(ttop_ARG_metab, FCIndex = 2, pValIndex = 5, IDIndex = 1,nlabels = 30, label = T) + ggtitle("ARG_metab metastasis vs primary tumor") + ylab("-log10(pvalue)")
