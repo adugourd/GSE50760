@@ -1,3 +1,7 @@
 .Rproj.user/**
 omnipathr-log/**
 .Rproj.user
+<<<<<<< HEAD
+=======
+.DS_Store
+>>>>>>> 49cc1517367df90edff0bdb814588eef895e2fe5
